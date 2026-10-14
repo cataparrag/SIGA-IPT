@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: siga-postgres
+    environment:
+      POSTGRES_DB: siga
+      POSTGRES_USER: siga
+      POSTGRES_PASSWORD: siga
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
