@@ -7,7 +7,9 @@ import cl.ipt.siga.exception.NotFoundException;
 import cl.ipt.siga.model.Career;
 import cl.ipt.siga.model.StudyPlan;
 import cl.ipt.siga.model.StudyPlanStatus;
+import cl.ipt.siga.repository.StudentRepository;
 import cl.ipt.siga.repository.StudyPlanRepository;
+import cl.ipt.siga.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,8 @@ import java.util.Objects;
 public class StudyPlanService {
 
     private final StudyPlanRepository studyPlanRepository;
+    private final SubjectRepository subjectRepository;
+    private final StudentRepository studentRepository;
     private final CareerService careerService;
 
     @Transactional(readOnly = true)
@@ -65,7 +69,13 @@ public class StudyPlanService {
     @Transactional
     public void delete(Long id) {
         StudyPlan plan = getStudyPlan(id);
-        // TODO: forbid deleting plans with subjects or students.
+        // Rule: a plan associated with students cannot be physically deleted.
+        if (studentRepository.existsByStudyPlanId(id)) {
+            throw new ConflictException("El plan tiene estudiantes asociados y no puede eliminarse");
+        }
+        if (subjectRepository.existsByStudyPlanId(id)) {
+            throw new ConflictException("El plan tiene asignaturas asociadas y no puede eliminarse");
+        }
         studyPlanRepository.delete(plan);
     }
 

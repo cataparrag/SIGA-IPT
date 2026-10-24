@@ -7,6 +7,7 @@ import cl.ipt.siga.exception.NotFoundException;
 import cl.ipt.siga.model.Career;
 import cl.ipt.siga.model.CareerStatus;
 import cl.ipt.siga.repository.CareerRepository;
+import cl.ipt.siga.repository.StudentRepository;
 import cl.ipt.siga.repository.StudyPlanRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ public class CareerService {
 
     private final CareerRepository careerRepository;
     private final StudyPlanRepository studyPlanRepository;
+    private final StudentRepository studentRepository;
 
     @Transactional(readOnly = true)
     public List<CareerResponse> findAll() {
@@ -69,12 +71,11 @@ public class CareerService {
     @Transactional
     public void delete(Long id) {
         Career career = getCareer(id);
-        // Rule: a career with study plans (or students) cannot be physically deleted,
+        // Rule: a career with study plans or students cannot be physically deleted,
         // only its status can change.
-        // TODO: also check for students once the Student entity exists.
-        if (studyPlanRepository.existsByCareerId(id)) {
+        if (studyPlanRepository.existsByCareerId(id) || studentRepository.existsByCareerId(id)) {
             throw new ConflictException(
-                    "La carrera tiene planes de estudio asociados; solo se puede cambiar su estado");
+                    "La carrera tiene planes de estudio o estudiantes asociados; solo se puede cambiar su estado");
         }
         careerRepository.delete(career);
     }
