@@ -7,6 +7,7 @@ import cl.ipt.siga.exception.ConflictException;
 import cl.ipt.siga.exception.NotFoundException;
 import cl.ipt.siga.model.StudyPlan;
 import cl.ipt.siga.model.Subject;
+import cl.ipt.siga.repository.SectionRepository;
 import cl.ipt.siga.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class SubjectService {
     static final int MAX_PREREQUISITES = 3;
 
     private final SubjectRepository subjectRepository;
+    private final SectionRepository sectionRepository;
     private final StudyPlanService studyPlanService;
 
     @Transactional(readOnly = true)
@@ -92,6 +94,9 @@ public class SubjectService {
         // TODO: check the academic record once that entity exists.
         if (!subjectRepository.findByPrerequisitesId(id).isEmpty()) {
             throw new ConflictException("La asignatura es prerrequisito de otras y no puede eliminarse");
+        }
+        if (sectionRepository.existsBySubjectId(id)) {
+            throw new ConflictException("La asignatura tiene secciones asociadas y no puede eliminarse");
         }
         subjectRepository.delete(subject);
     }

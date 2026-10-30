@@ -4,8 +4,10 @@ import cl.ipt.siga.dto.TeacherRequest;
 import cl.ipt.siga.dto.TeacherResponse;
 import cl.ipt.siga.exception.ConflictException;
 import cl.ipt.siga.exception.NotFoundException;
+import cl.ipt.siga.model.PeriodStatus;
 import cl.ipt.siga.model.Teacher;
 import cl.ipt.siga.model.TeacherStatus;
+import cl.ipt.siga.repository.SectionRepository;
 import cl.ipt.siga.repository.TeacherRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import java.util.List;
 public class TeacherService {
 
     private final TeacherRepository teacherRepository;
+    private final SectionRepository sectionRepository;
 
     @Transactional(readOnly = true)
     public List<TeacherResponse> findAll() {
@@ -64,7 +67,10 @@ public class TeacherService {
     public TeacherResponse changeStatus(Long id, TeacherStatus newStatus) {
         Teacher teacher = getTeacher(id);
         // Rule: a teacher cannot become INACTIVE while assigned to sections of an OPEN period.
-        // TODO: implement with SectionRepository (Epic 5).
+        if (newStatus == TeacherStatus.INACTIVE
+                && sectionRepository.existsByTeacherIdAndPeriodStatus(id, PeriodStatus.OPEN)) {
+            throw new ConflictException("El docente tiene secciones en un período abierto y no puede quedar inactivo");
+        }
         teacher.setStatus(newStatus);
         return TeacherResponse.from(teacherRepository.save(teacher));
     }
@@ -73,7 +79,9 @@ public class TeacherService {
     public void delete(Long id) {
         Teacher teacher = getTeacher(id);
         // Rule: a teacher with sections cannot be physically deleted.
-        // TODO: implement with SectionRepository (Epic 5).
+        if (sectionRepository.existsByTeacherId(id)) {
+            throw new ConflictException("El docente tiene secciones asociadas y no puede eliminarse");
+        }
         teacherRepository.delete(teacher);
     }
 
