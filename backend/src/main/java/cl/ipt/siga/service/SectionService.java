@@ -12,6 +12,7 @@ import cl.ipt.siga.model.Section;
 import cl.ipt.siga.model.Subject;
 import cl.ipt.siga.model.Teacher;
 import cl.ipt.siga.model.TeacherStatus;
+import cl.ipt.siga.repository.EnrollmentRepository;
 import cl.ipt.siga.repository.SectionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ public class SectionService {
     static final int MAX_CAPACITY = 60;
 
     private final SectionRepository sectionRepository;
+    private final EnrollmentRepository enrollmentRepository;
     private final SubjectService subjectService;
     private final AcademicPeriodService periodService;
     private final TeacherService teacherService;
@@ -39,7 +41,7 @@ public class SectionService {
     public List<SectionResponse> findByPeriod(Long periodId) {
         periodService.getPeriod(periodId);
         return sectionRepository.findByPeriodId(periodId).stream()
-                .map(SectionResponse::from)
+                .map(this::toResponse)
                 .toList();
     }
 
@@ -47,13 +49,13 @@ public class SectionService {
     public List<SectionResponse> findByTeacher(Long teacherId) {
         teacherService.getTeacher(teacherId);
         return sectionRepository.findByTeacherId(teacherId).stream()
-                .map(SectionResponse::from)
+                .map(this::toResponse)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public SectionResponse findById(Long id) {
-        return SectionResponse.from(getSection(id));
+        return toResponse(getSection(id));
     }
 
     @Transactional
@@ -80,7 +82,7 @@ public class SectionService {
         section.setTeacher(teacher);
         section.setCapacity(request.capacity());
         section.setBlocks(blocks);
-        return SectionResponse.from(sectionRepository.save(section));
+        return toResponse(sectionRepository.save(section));
     }
 
     @Transactional
@@ -90,27 +92,38 @@ public class SectionService {
 
         Teacher teacher = teacherService.getTeacher(request.teacherId());
         validateCapacity(request.capacity());
-        // TODO (Epic 6): the capacity cannot be lower than the number of enrolled students.
+        // Rule: enrolled students cannot exceed the capacity.
+        long enrolled = enrollmentRepository.countBySectionId(id);
+        if (request.capacity() < enrolled) {
+            throw new ConflictException("La sección ya tiene " + enrolled
+                    + " estudiantes inscritos; la capacidad no puede ser menor");
+        }
         Set<String> blocks = validateBlocks(request.blocks(), section.getSubject());
         validateTeacher(teacher, section.getPeriod(), blocks, section.getId());
 
         section.setTeacher(teacher);
         section.setCapacity(request.capacity());
         section.setBlocks(blocks);
-        return SectionResponse.from(sectionRepository.save(section));
+        return toResponse(sectionRepository.save(section));
     }
 
     @Transactional
     public void delete(Long id) {
         Section section = getSection(id);
         // Rule: a section with enrolled students cannot be physically deleted.
-        // TODO (Epic 6): check enrollments.
+        if (enrollmentRepository.existsBySectionId(id)) {
+            throw new ConflictException("La sección tiene estudiantes inscritos y no puede eliminarse");
+        }
         sectionRepository.delete(section);
     }
 
     public Section getSection(Long id) {
         return sectionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("No existe la sección con id " + id));
+    }
+
+    private SectionResponse toResponse(Section section) {
+        return SectionResponse.from(section, enrollmentRepository.countBySectionId(section.getId()));
     }
 
     /** Sections can only be created or changed while their period is OPEN. */

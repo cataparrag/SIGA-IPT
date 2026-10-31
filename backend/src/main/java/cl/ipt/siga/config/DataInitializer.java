@@ -8,6 +8,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +28,8 @@ public class DataInitializer implements CommandLineRunner {
     private final TeacherRepository teacherRepository;
     private final StudentRepository studentRepository;
     private final AcademicPeriodRepository periodRepository;
+    private final SectionRepository sectionRepository;
+    private final MatriculationRepository matriculationRepository;
 
     /** Each line: semester | code | name | T-E-L | SCT | prerequisites (comma separated). */
     private static final String TAP_2021_3 = """
@@ -131,11 +134,45 @@ public class DataInitializer implements CommandLineRunner {
         period.setStatus(PeriodStatus.OPEN);
         periodRepository.save(period);
 
-        createTeacher("11111111-1", "Ana Rojas", "ana.rojas@ipt.cl", "Ingeniera Informática", "Magíster");
-        createTeacher("12222222-2", "Luis Pérez", "luis.perez@ipt.cl", "Ingeniero de Software", "Licenciado");
+        Teacher ana = createTeacher("11111111-1", "Ana Rojas", "ana.rojas@ipt.cl", "Ingeniera Informática", "Magíster");
+        Teacher luis = createTeacher("12222222-2", "Luis Pérez", "luis.perez@ipt.cl", "Ingeniero de Software", "Licenciado");
 
-        createStudent("21111111-1", "Pedro Soto", "pedro.soto@ipt.cl", tap);
-        createStudent("22222222-2", "María González", "maria.gonzalez@ipt.cl", tap);
+        Student pedro = createStudent("21111111-1", "Pedro Soto", "pedro.soto@ipt.cl", tap);
+        Student maria = createStudent("22222222-2", "María González", "maria.gonzalez@ipt.cl", tap);
+
+        // Academic offer 2027-1: the six first-semester subjects of TAP, without schedule conflicts.
+        createSection(tap, "TAP101", period, ana, 30, "L1", "W1", "V1");
+        createSection(tap, "TAP102", period, ana, 30, "M1", "J1");
+        createSection(tap, "TAP103", period, ana, 30, "L2", "W2");
+        createSection(tap, "TAP104", period, luis, 30, "M2", "J2");
+        createSection(tap, "TAP105", period, luis, 30, "L3", "W3");
+        createSection(tap, "TAP106", period, luis, 30, "M3", "J3");
+
+        createMatriculation(pedro, period);
+        createMatriculation(maria, period);
+    }
+
+    private void createSection(StudyPlan plan, String subjectCode, AcademicPeriod period, Teacher teacher,
+                               int capacity, String... blocks) {
+        Subject subject = subjectRepository.findByStudyPlanIdOrderBySemesterAscCodeAsc(plan.getId()).stream()
+                .filter(s -> s.getCode().equals(subjectCode))
+                .findFirst()
+                .orElseThrow();
+        Section section = new Section();
+        section.setSubject(subject);
+        section.setPeriod(period);
+        section.setTeacher(teacher);
+        section.setCapacity(capacity);
+        section.getBlocks().addAll(Arrays.asList(blocks));
+        sectionRepository.save(section);
+    }
+
+    private void createMatriculation(Student student, AcademicPeriod period) {
+        Matriculation matriculation = new Matriculation();
+        matriculation.setStudent(student);
+        matriculation.setPeriod(period);
+        matriculation.setRegisteredAt(LocalDate.now());
+        matriculationRepository.save(matriculation);
     }
 
     private StudyPlan createCareerWithPlan(String code, String name, String description,
@@ -177,7 +214,7 @@ public class DataInitializer implements CommandLineRunner {
         return plan;
     }
 
-    private void createTeacher(String run, String fullName, String email, String title, String degree) {
+    private Teacher createTeacher(String run, String fullName, String email, String title, String degree) {
         Teacher teacher = new Teacher();
         teacher.setRun(run);
         teacher.setFullName(fullName);
@@ -185,10 +222,10 @@ public class DataInitializer implements CommandLineRunner {
         teacher.setProfessionalTitle(title);
         teacher.setAcademicDegree(degree);
         teacher.setStatus(TeacherStatus.ACTIVE);
-        teacherRepository.save(teacher);
+        return teacherRepository.save(teacher);
     }
 
-    private void createStudent(String run, String fullName, String email, StudyPlan plan) {
+    private Student createStudent(String run, String fullName, String email, StudyPlan plan) {
         Student student = new Student();
         student.setRun(run);
         student.setFullName(fullName);
@@ -196,6 +233,6 @@ public class DataInitializer implements CommandLineRunner {
         student.setCareer(plan.getCareer());
         student.setStudyPlan(plan);
         student.setStatus(StudentStatus.REGULAR);
-        studentRepository.save(student);
+        return studentRepository.save(student);
     }
 }

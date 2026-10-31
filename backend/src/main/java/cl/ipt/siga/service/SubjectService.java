@@ -7,6 +7,7 @@ import cl.ipt.siga.exception.ConflictException;
 import cl.ipt.siga.exception.NotFoundException;
 import cl.ipt.siga.model.StudyPlan;
 import cl.ipt.siga.model.Subject;
+import cl.ipt.siga.repository.AcademicRecordRepository;
 import cl.ipt.siga.repository.SectionRepository;
 import cl.ipt.siga.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class SubjectService {
 
     private final SubjectRepository subjectRepository;
     private final SectionRepository sectionRepository;
+    private final AcademicRecordRepository academicRecordRepository;
     private final StudyPlanService studyPlanService;
 
     @Transactional(readOnly = true)
@@ -91,7 +93,9 @@ public class SubjectService {
     public void delete(Long id) {
         Subject subject = getSubject(id);
         // Rule: a subject in a student's academic record cannot be physically deleted.
-        // TODO: check the academic record once that entity exists.
+        if (academicRecordRepository.existsBySubjectId(id)) {
+            throw new ConflictException("La asignatura forma parte del historial académico y no puede eliminarse");
+        }
         if (!subjectRepository.findByPrerequisitesId(id).isEmpty()) {
             throw new ConflictException("La asignatura es prerrequisito de otras y no puede eliminarse");
         }

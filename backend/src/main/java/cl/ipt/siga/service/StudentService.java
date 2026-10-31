@@ -11,6 +11,8 @@ import cl.ipt.siga.model.Student;
 import cl.ipt.siga.model.StudentStatus;
 import cl.ipt.siga.model.StudyPlan;
 import cl.ipt.siga.model.StudyPlanStatus;
+import cl.ipt.siga.repository.AcademicRecordRepository;
+import cl.ipt.siga.repository.EnrollmentRepository;
 import cl.ipt.siga.repository.StudentRepository;
 import cl.ipt.siga.repository.StudyPlanRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,8 @@ public class StudentService {
 
     private final StudentRepository studentRepository;
     private final StudyPlanRepository studyPlanRepository;
+    private final EnrollmentRepository enrollmentRepository;
+    private final AcademicRecordRepository academicRecordRepository;
     private final CareerService careerService;
     private final StudyPlanService studyPlanService;
 
@@ -144,11 +148,9 @@ public class StudentService {
                         "La carrera " + career.getCode() + " no tiene un plan de estudios vigente"));
     }
 
-    /**
-     * Whether the student has enrollments or academic record entries.
-     * TODO: implement with EnrollmentRepository and AcademicRecordRepository (Epics 6 and 7).
-     */
+    /** Whether the student has enrollments or academic record entries. */
     private boolean hasAcademicActivity(Student student) {
-        return false;
+        return enrollmentRepository.existsByStudentId(student.getId())
+                || academicRecordRepository.existsByStudentId(student.getId());
     }
 }

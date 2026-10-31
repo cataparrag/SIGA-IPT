@@ -16,9 +16,11 @@ public record SectionResponse(
         Long teacherId,
         String teacherName,
         int capacity,
+        long enrolledCount,
+        long availableSeats,
         List<String> blocks) {
 
-    public static SectionResponse from(Section section) {
+    public static SectionResponse from(Section section, long enrolledCount) {
         return new SectionResponse(
                 section.getId(),
                 section.getSubject().getId(),
@@ -30,6 +32,8 @@ public record SectionResponse(
                 section.getTeacher().getId(),
                 section.getTeacher().getFullName(),
                 section.getCapacity(),
+                enrolledCount,
+                Math.max(0, section.getCapacity() - enrolledCount),
                 ScheduleBlocks.sorted(section.getBlocks()));
     }
 }
