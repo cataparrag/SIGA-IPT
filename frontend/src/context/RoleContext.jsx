@@ -1,21 +1,42 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
+import { Box, CircularProgress, Typography } from '@mui/material'
+import keycloak from '../auth/keycloak'
+import api, { errorMessage } from '../api/client'
 
-/**
- * TEMPORARY: lets you switch roles to see each view while Keycloak is not connected.
- * Tomorrow the role and the user will come from the Keycloak token.
- */
-const DEMO_USERS = {
-  ADMIN: { name: 'Marcela Díaz', role: 'ADMIN' },
-  TEACHER: { name: 'Ana Rojas', role: 'TEACHER', teacherId: 1 },
-  STUDENT: { name: 'Pedro Soto', role: 'STUDENT', studentId: 1 },
-}
-
+const ROLE_PRIORITY = ['ADMIN', 'TEACHER', 'STUDENT']
 const RoleContext = createContext(null)
 
+/**
+ * Provides the logged-in user. The role comes from the Keycloak token; the
+ * student/teacher id comes from /api/me (the backend links them by email).
+ */
 export function RoleProvider({ children }) {
-  const [role, setRole] = useState('ADMIN')
-  const value = { role, setRole, user: DEMO_USERS[role] }
-  return <RoleContext.Provider value={value}>{children}</RoleContext.Provider>
+  const [user, setUser] = useState(null)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    api.get('/me')
+      .then(({ data }) => setUser(data))
+      .catch((err) => setError(errorMessage(err)))
+  }, [])
+
+  if (error) {
+    return (
+      <Box sx={{ display: 'grid', placeItems: 'center', minHeight: '100vh', p: 3, textAlign: 'center' }}>
+        <Box>
+          <Typography variant="h6">No se pudo cargar tu cuenta</Typography>
+          <Typography color="text.secondary">{error}</Typography>
+        </Box>
+      </Box>
+    )
+  }
+  if (!user) {
+    return <Box sx={{ display: 'grid', placeItems: 'center', minHeight: '100vh' }}><CircularProgress /></Box>
+  }
+
+  const role = ROLE_PRIORITY.find((r) => user.roles.includes(r))
+  const logout = () => keycloak.logout({ redirectUri: window.location.origin })
+  return <RoleContext.Provider value={{ role, user, logout }}>{children}</RoleContext.Provider>
 }
 
 export function useRole() {

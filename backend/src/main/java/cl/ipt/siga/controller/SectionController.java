@@ -3,6 +3,7 @@ package cl.ipt.siga.controller;
 import cl.ipt.siga.dto.SectionRequest;
 import cl.ipt.siga.dto.SectionResponse;
 import cl.ipt.siga.dto.SectionUpdateRequest;
+import cl.ipt.siga.security.CurrentUser;
 import cl.ipt.siga.service.SectionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import java.util.List;
 public class SectionController {
 
     private final SectionService sectionService;
+    private final CurrentUser currentUser;
 
     /** Academic offer: all sections of a period. */
     @GetMapping("/periods/{periodId}/sections")
@@ -27,6 +29,7 @@ public class SectionController {
 
     @GetMapping("/teachers/{teacherId}/sections")
     public List<SectionResponse> findByTeacher(@PathVariable Long teacherId) {
+        currentUser.checkTeacherAccess(teacherId);
         return sectionService.findByTeacher(teacherId);
     }
 

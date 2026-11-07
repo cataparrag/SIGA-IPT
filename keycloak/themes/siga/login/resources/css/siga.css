@@ -1,0 +1,216 @@
+/* SIGA IPT: purple and orange palette, same as the web app */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --siga-purple: #4E2A84;
+  --siga-purple-dark: #341A5E;
+  --siga-orange: #E8772E;
+  --siga-ink: #1E1A2B;
+  --siga-muted: #5E586E;
+  --siga-line: #E6E1EF;
+  --siga-soft: #F6F4FA;
+}
+
+html.login-pf,
+.login-pf body {
+  background:
+    radial-gradient(circle at 88% 8%, rgba(232, 119, 46, 0.95) 0 150px, transparent 151px),
+    radial-gradient(circle at 6% 96%, transparent 0 150px, rgba(255, 255, 255, 0.07) 151px 185px, transparent 186px),
+    linear-gradient(135deg, var(--siga-purple) 0%, var(--siga-purple-dark) 100%) !important;
+  background-attachment: fixed !important;
+  background-size: auto !important;
+  font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif !important;
+  color: var(--siga-ink);
+}
+
+.login-pf body * {
+  font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif !important;
+}
+
+/* Header: logo mark + name */
+#kc-header-wrapper {
+  color: #fff !important;
+  font-size: 26px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.01em !important;
+  text-transform: none !important;
+  padding: 48px 10px 24px !important;
+}
+
+#kc-header-wrapper::before {
+  content: 'S';
+  display: block;
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 14px;
+  border-radius: 17px;
+  background: radial-gradient(circle at 84% 16%, var(--siga-orange) 0 7px, #fff 8px);
+  color: var(--siga-purple);
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 58px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(20, 8, 40, 0.35);
+}
+
+#kc-header-wrapper::after {
+  content: 'Sistema de Gestión Académica';
+  display: block;
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+/* Card */
+.login-pf-page .card-pf,
+.card-pf {
+  background: #fff !important;
+  color: var(--siga-ink) !important;
+  border: 0 !important;
+  border-top: 0 !important;
+  border-radius: 22px !important;
+  box-shadow: 0 28px 70px rgba(20, 8, 40, 0.38) !important;
+  padding: 40px 44px 36px !important;
+  max-width: 460px !important;
+  margin: 0 auto !important;
+}
+
+#kc-page-title {
+  color: var(--siga-ink) !important;
+  font-size: 26px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.01em;
+  text-align: left !important;
+}
+
+#kc-page-title::after {
+  content: 'Usa tu correo institucional del IPT';
+  display: block;
+  margin-top: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--siga-muted);
+}
+
+/* Labels and inputs */
+.card-pf label,
+.pf-c-form__label-text,
+.control-label {
+  color: var(--siga-muted) !important;
+  font-weight: 600 !important;
+  font-size: 13.5px !important;
+}
+
+.card-pf input[type='text'],
+.card-pf input[type='password'],
+.card-pf input[type='email'],
+.pf-c-form-control {
+  background: var(--siga-soft) !important;
+  color: var(--siga-ink) !important;
+  border: 1px solid var(--siga-line) !important;
+  border-radius: 12px !important;
+  height: 48px !important;
+  padding: 0 14px !important;
+  font-size: 15px !important;
+  box-shadow: none !important;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.card-pf input:focus,
+.pf-c-form-control:focus {
+  border-color: var(--siga-purple) !important;
+  box-shadow: 0 0 0 3px rgba(78, 42, 132, 0.15) !important;
+  outline: none !important;
+}
+
+.pf-c-form-control::after,
+.pf-c-form-control::before {
+  display: none !important;
+}
+
+/* Password field with the "show" button */
+.pf-c-input-group .pf-c-form-control {
+  border-radius: 12px 0 0 12px !important;
+}
+
+.pf-c-input-group .pf-c-button.pf-m-control {
+  background: var(--siga-soft) !important;
+  color: var(--siga-muted) !important;
+  border: 1px solid var(--siga-line) !important;
+  border-left: 0 !important;
+  border-radius: 0 12px 12px 0 !important;
+  height: 48px !important;
+}
+
+.pf-c-input-group .pf-c-button.pf-m-control::after {
+  display: none !important;
+}
+
+/* Primary button */
+#kc-login,
+.card-pf .pf-c-button.pf-m-primary,
+.card-pf .btn-primary {
+  background: var(--siga-purple) !important;
+  border: 0 !important;
+  border-radius: 12px !important;
+  height: 50px !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.01em;
+  box-shadow: 0 10px 24px rgba(78, 42, 132, 0.32) !important;
+  transition: background 0.15s, transform 0.15s;
+  margin-top: 8px;
+}
+
+#kc-login:hover,
+.card-pf .pf-c-button.pf-m-primary:hover {
+  background: var(--siga-purple-dark) !important;
+  transform: translateY(-1px);
+}
+
+#kc-login:focus-visible {
+  outline: 3px solid rgba(232, 119, 46, 0.6) !important;
+  outline-offset: 2px;
+}
+
+/* Links and messages */
+.card-pf a {
+  color: var(--siga-purple) !important;
+  font-weight: 600;
+}
+
+.card-pf a:hover {
+  color: var(--siga-orange) !important;
+}
+
+.alert-error,
+.pf-c-alert.pf-m-danger,
+.pf-m-danger {
+  border-radius: 12px !important;
+}
+
+.kc-feedback-text,
+#input-error,
+.pf-c-form__helper-text.pf-m-error {
+  color: #C9403A !important;
+  font-weight: 600 !important;
+}
+
+/* Language selector (if shown) */
+#kc-locale-dropdown a,
+#kc-current-locale-link {
+  color: #fff !important;
+}
+
+@media (max-width: 600px) {
+  .login-pf-page .card-pf,
+  .card-pf {
+    border-radius: 18px !important;
+    padding: 28px 22px !important;
+    margin: 0 12px !important;
+  }
+  #kc-header-wrapper {
+    padding-top: 28px !important;
+  }
+}

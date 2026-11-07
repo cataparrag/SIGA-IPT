@@ -8,10 +8,9 @@ import java.util.List;
 /**
  * The sections the student wants to take in a period, all in one request,
  * so the minimum/maximum and schedule rules are checked on the whole selection.
- * Later the studentId will come from the logged-in user (Keycloak token).
+ * The student is the logged-in user (taken from the Keycloak token).
  */
 public record EnrollmentRequest(
-        @NotNull Long studentId,
         @NotNull Long periodId,
         @NotEmpty List<Long> sectionIds) {
 }

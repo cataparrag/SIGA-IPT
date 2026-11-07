@@ -15,8 +15,13 @@ export default function useApi(url) {
     setLoading(true)
     setError(null)
     api.get(url)
-      .then((response) => setData(response.data))
-      .catch((err) => setError(errorMessage(err)))
+      .then((response) => {
+        if (typeof response.data === 'string') {
+          throw new Error('El servidor no respondió con datos. ¿Está corriendo el backend?')
+        }
+        setData(response.data)
+      })
+      .catch((err) => setError(err.response ? errorMessage(err) : err.message))
       .finally(() => setLoading(false))
   }, [url])
 

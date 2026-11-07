@@ -3,6 +3,7 @@ package cl.ipt.siga.controller;
 import cl.ipt.siga.dto.TeacherRequest;
 import cl.ipt.siga.dto.TeacherResponse;
 import cl.ipt.siga.dto.TeacherStatusRequest;
+import cl.ipt.siga.security.CurrentUser;
 import cl.ipt.siga.service.TeacherService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import java.util.List;
 public class TeacherController {
 
     private final TeacherService teacherService;
+    private final CurrentUser currentUser;
 
     @GetMapping
     public List<TeacherResponse> findAll() {
@@ -26,6 +28,7 @@ public class TeacherController {
 
     @GetMapping("/{id}")
     public TeacherResponse findById(@PathVariable Long id) {
+        currentUser.checkTeacherAccess(id);
         return teacherService.findById(id);
     }
 

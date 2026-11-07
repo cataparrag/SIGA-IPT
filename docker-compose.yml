@@ -11,5 +11,20 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: siga-keycloak
+    # Development mode; on startup it imports the realm in ./keycloak (roles, client and users).
+    command: start-dev --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HTTP_RELATIVE_PATH: /auth
+    ports:
+      - "8180:8080"
+    volumes:
+      - ./keycloak/siga-ipt-realm.json:/opt/keycloak/data/import/siga-ipt-realm.json
+      - ./keycloak/themes/siga:/opt/keycloak/themes/siga
+
 volumes:
   pgdata:

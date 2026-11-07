@@ -1,0 +1,143 @@
+{
+  "realm": "siga-ipt",
+  "displayName": "SIGA IPT",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "internationalizationEnabled": true,
+  "supportedLocales": [
+    "es"
+  ],
+  "defaultLocale": "es",
+  "roles": {
+    "realm": [
+      {
+        "name": "ADMIN",
+        "description": "Administrador académico"
+      },
+      {
+        "name": "TEACHER",
+        "description": "Docente"
+      },
+      {
+        "name": "STUDENT",
+        "description": "Estudiante"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "siga-frontend",
+      "name": "SIGA IPT frontend",
+      "enabled": true,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": [
+        "http://localhost:5173/*"
+      ],
+      "webOrigins": [
+        "+"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "+"
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "admin@ipt.cl",
+      "email": "admin@ipt.cl",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Marcela",
+      "lastName": "Díaz",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "siga1234",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "ADMIN"
+      ]
+    },
+    {
+      "username": "ana.rojas@ipt.cl",
+      "email": "ana.rojas@ipt.cl",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Ana",
+      "lastName": "Rojas",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "siga1234",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "TEACHER"
+      ]
+    },
+    {
+      "username": "luis.perez@ipt.cl",
+      "email": "luis.perez@ipt.cl",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Luis",
+      "lastName": "Pérez",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "siga1234",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "TEACHER"
+      ]
+    },
+    {
+      "username": "pedro.soto@ipt.cl",
+      "email": "pedro.soto@ipt.cl",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Pedro",
+      "lastName": "Soto",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "siga1234",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "STUDENT"
+      ]
+    },
+    {
+      "username": "maria.gonzalez@ipt.cl",
+      "email": "maria.gonzalez@ipt.cl",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "María",
+      "lastName": "González",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "siga1234",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "STUDENT"
+      ]
+    }
+  ],
+  "loginTheme": "siga"
+}

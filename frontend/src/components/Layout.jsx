@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import {
-  AppBar, Avatar, Box, Drawer, IconButton, List, ListItemButton, ListItemIcon,
-  ListItemText, MenuItem, TextField, Toolbar, Typography, useMediaQuery,
+  AppBar, Avatar, Box, Button, Drawer, IconButton, List, ListItemButton, ListItemIcon,
+  ListItemText, Toolbar, Typography, useMediaQuery,
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import MenuRounded from '@mui/icons-material/MenuRounded'
+import LogoutRounded from '@mui/icons-material/LogoutRounded'
 import { NAVIGATION, ROLE_LABELS } from '../navigation'
 import { useRole } from '../context/RoleContext'
 
@@ -33,8 +34,8 @@ function BrandMark() {
 }
 
 function SidebarContent({ onNavigate }) {
-  const { role, setRole } = useRole()
-  const items = NAVIGATION[role]
+  const { role, user, logout } = useRole()
+  const items = NAVIGATION[role] ?? []
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', p: 2 }}>
@@ -69,20 +70,12 @@ function SidebarContent({ onNavigate }) {
         ))}
       </List>
 
-      {/* TEMPORARY: replaced by the Keycloak login tomorrow */}
-      <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(232, 119, 46, 0.08)', border: '1px dashed', borderColor: 'secondary.light' }}>
-        <Typography variant="caption" sx={{ fontWeight: 700, color: 'secondary.dark' }}>
-          Vista de demostración
-        </Typography>
-        <TextField
-          select fullWidth size="small" value={role}
-          onChange={(e) => setRole(e.target.value)}
-          sx={{ mt: 1, bgcolor: '#fff', borderRadius: 2 }}
-        >
-          {Object.entries(ROLE_LABELS).map(([value, label]) => (
-            <MenuItem key={value} value={value}>{label}</MenuItem>
-          ))}
-        </TextField>
+      <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(78, 42, 132, 0.05)', border: '1px solid', borderColor: 'divider' }}>
+        <Typography variant="subtitle2" noWrap>{user.name}</Typography>
+        <Typography variant="caption" color="text.secondary" noWrap component="div">{user.email}</Typography>
+        <Button fullWidth size="small" variant="outlined" color="primary" startIcon={<LogoutRounded />} onClick={logout} sx={{ mt: 1.25 }}>
+          Cerrar sesión
+        </Button>
       </Box>
     </Box>
   )
@@ -94,7 +87,7 @@ export default function Layout() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const { role, user } = useRole()
   const location = useLocation()
-  const current = NAVIGATION[role].find((item) =>
+  const current = (NAVIGATION[role] ?? []).find((item) =>
     item.path === '/' ? location.pathname === '/' : location.pathname.startsWith(item.path))
 
   const initials = user.name.split(' ').map((w) => w[0]).slice(0, 2).join('')

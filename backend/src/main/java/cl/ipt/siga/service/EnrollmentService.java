@@ -81,8 +81,8 @@ public class EnrollmentService {
     // ---------------------------------------------------------------- enrollment
 
     @Transactional
-    public List<EnrollmentResponse> enroll(EnrollmentRequest request) {
-        Student student = studentService.getStudent(request.studentId());
+    public List<EnrollmentResponse> enroll(Long studentId, EnrollmentRequest request) {
+        Student student = studentService.getStudent(studentId);
         AcademicPeriod period = periodService.getPeriod(request.periodId());
 
         // Rule: the student must be REGULAR and matriculated in the period.
