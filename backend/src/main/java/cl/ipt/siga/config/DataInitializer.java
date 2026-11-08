@@ -5,6 +5,7 @@ import cl.ipt.siga.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,9 +17,11 @@ import java.util.Map;
 /**
  * Loads the study plans of Appendix A (plus a period, teachers and students for demos)
  * the first time the application starts with an empty database.
+ * In production only one of the three replicas runs it (siga.seed-data=true).
  */
 @Slf4j
 @Component
+@ConditionalOnProperty(name = "siga.seed-data", havingValue = "true", matchIfMissing = true)
 @RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
 
